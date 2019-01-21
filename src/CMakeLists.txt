@@ -48,3 +48,5 @@ target_link_libraries(pyORBIT python2.7 po_linac po_mpi po_orbit po_spacecharge 
 install(TARGETS pyORBIT
     RUNTIME DESTINATION bin
 )
+
+#add_subdirectory(tests)
