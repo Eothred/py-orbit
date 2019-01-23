@@ -20,6 +20,8 @@ include_directories(utils/integration)
 include_directories(utils/matrix)
 include_directories(utils/polynomial)
 
+set(CMAKE_CXX_FLAGS "-fPIC")
+
 # We add all subdirectories (that generate libraries)
 add_subdirectory(linac)
 add_subdirectory(mpi)
