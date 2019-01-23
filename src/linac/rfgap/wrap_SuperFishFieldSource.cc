@@ -63,7 +63,7 @@ extern "C" {
 		if(!PyArg_ParseTuple(args,"OOO:setGrid2D_Fields",&pyGrid2D_Ez,&pyGrid2D_Er,&pyGrid2D_H)){
 			ORBIT_MPI_Finalize("PySuperFishFieldSource - setGrid2D_Fields(grid2D_Ez,grid2D_Er,grid2D_H) - parameters are needed.");
 		}		
-		PyObject* pyORBIT_Grid2D_Type = getSpaceChargeType("Grid2D");
+		PyObject* pyORBIT_Grid2D_Type = wrap_spacecharge::getSpaceChargeType("Grid2D");
 		if(!PyObject_IsInstance(pyGrid2D_Ez,pyORBIT_Grid2D_Type) || 
 			 !PyObject_IsInstance(pyGrid2D_Er,pyORBIT_Grid2D_Type) ||
 		   !PyObject_IsInstance(pyGrid2D_H,pyORBIT_Grid2D_Type)) {

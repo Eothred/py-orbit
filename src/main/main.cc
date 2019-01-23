@@ -64,11 +64,11 @@ int main(int argc, char **argv)
 
   // Runge-Kutta tracker package
 
-  inittrackerrk4();
+  wrap_trackerrk4::inittrackerrk4();
 
   // Space-charge package
 
-  initspacecharge();
+  wrap_spacecharge::initspacecharge();
 
   // The python interpreter
   // It will call Py_Initialize() again, but there is no harm.

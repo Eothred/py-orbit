@@ -7,7 +7,10 @@
 extern "C" {
 #endif
 
+  namespace wrap_trackerrk4
+  {
 	void inittrackerrk4(void);
+  }
 	
 #ifdef __cplusplus
 }
