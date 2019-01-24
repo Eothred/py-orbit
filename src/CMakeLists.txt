@@ -7,6 +7,10 @@ include_directories(${Python2_INCLUDE_DIR})
 
 find_package(FFTW)
 
+find_package(MPI)
+include_directories(${MPI_INCLUDE_PATH})
+
+
 # add all includes that subfolders may depend on:
 include_directories(main)
 include_directories(mpi)
