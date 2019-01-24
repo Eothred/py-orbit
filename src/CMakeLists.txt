@@ -7,6 +7,10 @@ include_directories(${Python2_INCLUDE_DIR})
 
 find_package(FFTW)
 
+find_package(MPI)
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+
+
 # add all includes that subfolders may depend on:
 include_directories(main)
 include_directories(mpi)
@@ -46,9 +50,6 @@ include_directories(trackerrk4)
 # Finally we create the main project..
 add_executable(pyORBIT main/main)
 target_link_libraries(pyORBIT python2.7 po_linac po_mpi po_orbit po_spacecharge po_teapot po_trackerrk4 po_utils ${FFTW_LIBRARIES})
-
-install(TARGETS pyORBIT
-    RUNTIME DESTINATION bin
-)
+python_standalone_executable(pyORBIT)
 
 #add_subdirectory(tests)

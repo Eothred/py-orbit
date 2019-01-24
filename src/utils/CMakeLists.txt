@@ -9,7 +9,7 @@ add_subdirectory(statistics)
 file(GLOB src_files *.cc)
 add_library(po_utils ${src_files})
 
-target_link_libraries(po_utils po_utils_bunch po_utils_integration po_utils_matrix po_utils_polynomial po_utils_statistics )
+target_link_libraries(po_utils po_utils_bunch po_utils_integration po_utils_matrix po_utils_polynomial po_utils_statistics po_mpi)
 
 install(TARGETS po_utils po_utils_bunch po_utils_integration po_utils_matrix po_utils_polynomial po_utils_statistics
     LIBRARY DESTINATION lib
@@ -17,3 +17,12 @@ install(TARGETS po_utils po_utils_bunch po_utils_integration po_utils_matrix po_
     ARCHIVE DESTINATION lib
     COMPONENT Libraries
 )
+
+
+
+# This is how the actual Python object should look like
+add_library(_utils MODULE  ${src_files})
+python_extension_module(_utils)
+target_link_libraries(_utils po_utils_bunch po_utils_integration po_utils_matrix po_utils_polynomial po_utils_statistics po_mpi)
+#target_link_libraries_with_dynamic_lookup(_utils po_utils_bunch po_utils_integration po_utils_matrix po_utils_polynomial po_utils_statistics po_mpi)
+install(TARGETS _utils LIBRARY DESTINATION orbit/utils)
