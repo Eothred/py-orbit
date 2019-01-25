@@ -1,3 +1,5 @@
 file(GLOB src_files wrap_*.cc)
-add_library(po_linac_rfgap ${src_files})
-target_link_libraries(po_linac_rfgap pyorbit)
+add_library(linac_rfgap MODULE  ${src_files})
+python_extension_module(linac_rfgap)
+target_link_libraries(linac_rfgap pyorbit)
+install(TARGETS linac_rfgap LIBRARY DESTINATION .)

@@ -1,6 +1,4 @@
 file(GLOB src_files wrap_*.cc)
-
-# This is how the actual Python object should look like
 add_library(linac_tracking MODULE ${src_files})
 python_extension_module(linac_tracking)
 target_link_libraries(linac_tracking pyorbit)

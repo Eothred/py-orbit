@@ -1,26 +1,8 @@
 include_directories(SynchPartRedefinition)
 
 add_subdirectory(Apertures)
-add_subdirectory(BunchDiagnostics)
-add_subdirectory(Errors)
-add_subdirectory(FieldTracker)
-add_subdirectory(Impedances)
-add_subdirectory(MaterialInteractions)
-add_subdirectory(ParticlesAttributes)
-add_subdirectory(RFCavities)
-add_subdirectory(SynchPartRedefinition)
 
-
-install(TARGETS po_orbit_bunchdiag po_orbit_errors po_orbit_fieldtracker po_orbit_impedances po_orbit_materialint po_orbit_pattr po_orbit_rfcav po_orbit_synchpartredef
-    LIBRARY DESTINATION lib
-    COMPONENT Libraries
-    ARCHIVE DESTINATION lib
-    COMPONENT Libraries
-)
-
-# This is how the actual Python object should look like
-add_library(bunch MODULE  wrap_bunch)
+add_library(bunch MODULE wrap_bunch)
 python_extension_module(bunch)
-# I think this needs spacecharge as well?
-target_link_libraries(bunch pyorbit po_spacecharge ${FFTW_LIBRARIES} ${MPI_CXX_LIBRARIES})
+target_link_libraries(bunch pyorbit ${FFTW_LIBRARIES} ${MPI_CXX_LIBRARIES})
 install(TARGETS bunch LIBRARY DESTINATION .)
