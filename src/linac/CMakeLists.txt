@@ -17,3 +17,9 @@ install(TARGETS po_linac po_linac_rfgap po_linac_tracking
     ARCHIVE DESTINATION lib
     COMPONENT Libraries
 )
+
+# This is how the actual Python object should look like
+add_library(linac MODULE  ${src_files})
+python_extension_module(linac)
+target_link_libraries(linac po_linac_rfgap po_linac_tracking)
+install(TARGETS linac LIBRARY DESTINATION .)

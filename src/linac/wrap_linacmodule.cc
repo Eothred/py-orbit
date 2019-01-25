@@ -30,7 +30,7 @@ extern "C" {
 		 wrap_linac::initRfGapThreePointTTF(module);
 		 wrap_linac::initRfGapThreePointTTF_slow(module);
 		 //initialization of the linac tracking module
-		 wrap_linac_tracking::initlinactracking();
+		 wrap_linac_tracking::initlinac_tracking();
 	 }
 	 
 	 PyObject* getLinacType(char* name){

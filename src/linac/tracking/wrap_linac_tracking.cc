@@ -78,7 +78,7 @@ extern "C"
 		{ NULL, NULL }
 	};
 	
-	void initlinactracking()
+	void initlinac_tracking()
 	{
 		PyObject *m;
 		m = Py_InitModule((char*)"linac_tracking", linactrackingMethods);

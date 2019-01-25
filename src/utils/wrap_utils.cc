@@ -24,7 +24,7 @@ namespace wrap_orbit_utils{
 extern "C" {
 #endif
 
-  void initutils(){
+  void initorbit_utils(){
     //create new module
     PyObject* module = Py_InitModule("orbit_utils",UtilsModuleMethods);		
 		//add the other classes init

@@ -5,7 +5,7 @@ extern "C"
 
 namespace wrap_teapotbase
 {
-    void initteapotbase(void);
+    void initteapot_base(void);
     PyObject* getBaseTEAPOTType(char* name);
 }
 

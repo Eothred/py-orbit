@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 namespace wrap_orbit_utils{
-	void initutils(void);
+	void initorbit_utils(void);
 	PyObject* getOrbitUtilsType(const char* name);
 }
 

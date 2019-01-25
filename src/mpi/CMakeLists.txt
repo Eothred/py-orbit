@@ -10,7 +10,7 @@ install(TARGETS po_mpi
 )
 
 # This is how the actual Python object should look like
-add_library(_mpi MODULE  ${src_files})
-python_extension_module(_mpi)
-target_link_libraries(_mpi ${MPI_CXX_LIBRARIES})
-install(TARGETS _mpi LIBRARY DESTINATION orbit/mpi)
+add_library(orbit_mpi MODULE  ${src_files})
+python_extension_module(orbit_mpi)
+target_link_libraries(orbit_mpi po_orbit ${MPI_CXX_LIBRARIES})
+install(TARGETS orbit_mpi LIBRARY DESTINATION .)

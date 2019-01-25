@@ -488,7 +488,7 @@ extern "C"
 			{ NULL, NULL }
     };
 
-    void initteapotbase(void)
+    void initteapot_base(void)
     {
         PyObject *m, *d;
         m = Py_InitModule((char*)"teapot_base", teapotbaseMethods);

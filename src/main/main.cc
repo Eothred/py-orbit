@@ -51,8 +51,8 @@ int main(int argc, char **argv)
 
   wrap_orbit_mpi::initorbit_mpi();
   wrap_orbit_bunch::initbunch();
-  wrap_orbit_utils::initutils();
-  wrap_teapotbase::initteapotbase();
+  wrap_orbit_utils::initorbit_utils();
+  wrap_teapotbase::initteapot_base();
   wrap_errorbase::initerrorbase();
   wrap_linac::initlinac();
   wrap_collimator::initcollimator();
