@@ -13,5 +13,5 @@ install(TARGETS po_teapot
 add_library(teapot_base MODULE  wrap_teapotbase)
 python_extension_module(teapot_base)
 # I think this needs spacecharge as well?
-target_link_libraries(teapot_base po_teapot po_orbit)
+target_link_libraries(teapot_base po_teapot pyorbit)
 install(TARGETS teapot_base LIBRARY DESTINATION .)

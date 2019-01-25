@@ -283,9 +283,13 @@ void Bunch::initBunchAttributes(const char* fileName){
 }
 
 void Bunch::copyEmptyBunchTo(Bunch* bunch){
+    std::cout << "YIL DBG 0"<< std::endl;
+    std::cout << "YIL DBG " << this->getMPI_Comm_Local() << std::endl;
 	bunch->setMPI_Comm_Local(this->getMPI_Comm_Local());
+    std::cout << "YIL DBG 1"<< std::endl;
 	bunch->deleteAllParticles();
-
+    std::cout << "YIL DBG 2"<< std::endl;
+    
 	//copy bunch attributes
 	//the Attribute backet direct copy cannot be used
 	//because mass,charge, class. radius, macro-size_for_all are
