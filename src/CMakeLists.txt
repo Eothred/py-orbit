@@ -43,7 +43,6 @@ add_library(pyorbit ${pyorbit_src})
 target_link_libraries(pyorbit ${FFTW_LIBRARIES} ${MPI_CXX_LIBRARIES})
 install(TARGETS pyorbit
     LIBRARY DESTINATION lib
-    COMPONENT Libraries
     ARCHIVE DESTINATION lib
     COMPONENT Libraries
 )
@@ -62,6 +61,9 @@ include_directories(linac/tracking)
 include_directories(utils/statistics)
 add_executable(pyORBIT main/main ${all_wrap_src})
 target_link_libraries(pyORBIT python2.7 pyorbit ${FFTW_LIBRARIES})
-python_standalone_executable(pyORBIT)
+#python_standalone_executable(pyORBIT)
+install(TARGETS pyORBIT
+    RUNTIME DESTINATION bin
+)
 
 #add_subdirectory(tests)
