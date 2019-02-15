@@ -3,11 +3,7 @@
 #ifndef ORBIT_MPI_INCLUDE
 #define ORBIT_MPI_INCLUDE
 
-#ifndef USE_MPI
-#define USE_MPI 0
-#endif
-
-#if USE_MPI > 0
+#ifdef USE_MPI
  #include "mpi.h"
 #else
 //---------------------------------------------------------------

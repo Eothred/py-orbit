@@ -8,7 +8,12 @@ include_directories(${Python2_INCLUDE_DIR})
 find_package(FFTW)
 
 find_package(MPI)
-include_directories(${MPI_INCLUDE_PATH})
+#include(CMakeDependentOption)
+CMAKE_DEPENDENT_OPTION(USE_MPI "Enable MPI capabilities" ON "MPI_FOUND" OFF)
+if(USE_MPI)
+    add_definitions("-DUSE_MPI")
+    include_directories(${MPI_INCLUDE_PATH})
+endif(USE_MPI)
 
 
 # add all includes that subfolders may depend on:
