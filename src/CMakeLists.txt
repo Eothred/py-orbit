@@ -8,7 +8,7 @@ include_directories(${Python2_INCLUDE_DIR})
 find_package(FFTW)
 
 find_package(MPI)
-#include(CMakeDependentOption)
+include(CMakeDependentOption)
 CMAKE_DEPENDENT_OPTION(USE_MPI "Enable MPI capabilities" ON "MPI_FOUND" OFF)
 if(USE_MPI)
     add_definitions("-DUSE_MPI")

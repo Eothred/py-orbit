@@ -62,5 +62,5 @@ setup(
     'Programming Language :: Python :: 2',
     'Programming Language :: Python :: 2.7',
     ],
-    cmake_args = ['-DBUILD_SHARED_LIBS:BOOL=ON']
+    cmake_args = ['-DBUILD_SHARED_LIBS:BOOL=ON', '-DUSE_MPI=OFF']
     )
