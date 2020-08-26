@@ -9,7 +9,7 @@ import math
 import sys
 import os
 
-from orbit.utils import phaseNearTargetPhase, phaseNearTargetPhaseDeg
+from orbit.utils import orbitFinalize, phaseNearTargetPhase, phaseNearTargetPhaseDeg
 
 #---- base linac nodes
 from LinacAccNodes import AbstractRF_Gap
@@ -44,8 +44,8 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		E0L parameter is in GeV. Phases are in radians.
 		"""
 		AbstractRF_Gap.__init__(self,axis_field_rf_gap.getName())
-		self.axis_field_rf_gap = axis_field_rf_gap
-		self.setType("axis_field_and_quad_rfgap")			
+		self.setType("GAP&Q")
+		self.axis_field_rf_gap = axis_field_rf_gap	
 		self.addParam("E0TL",self.axis_field_rf_gap.getParam("E0TL"))
 		self.addParam("mode",self.axis_field_rf_gap.getParam("mode"))
 		self.addParam("gap_phase",self.axis_field_rf_gap.getParam("gap_phase"))
@@ -68,9 +68,13 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		self.part_pos = 0.
 		#---- The RF gap model - three points model
 		self.cppGapModel = RfGapThreePointTTF()
+		#---- If we going to use the longitudinal magnetic field component of quad
+		self.useLongField = False
 		#---- quadrupole field sources
 		#----quads_fields_arr is an array of [quad, fieldFunc, z_center_of_field]
 		self.quads_fields_arr = []
+		#---- If it is true then the this tracking will be in the reversed lattice
+		self.reversed_lattice = False		
 		
 	def setLinacTracker(self, switch = True):
 		"""
@@ -84,6 +88,18 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		else:
 			self.cppGapModel = RfGapThreePointTTF()
 
+	def setUseLongitudinalFieldOfQuad(self, use):
+		"""
+		If we going to use the longitudinal magnetic field component of quad
+		"""
+		self.useLongField = use
+		
+	def getUseLongitudinalFieldOfQuad(self):
+		"""
+		If we going to use the longitudinal magnetic field component of quad
+		"""
+		return self.useLongField
+
 	def getAxisFieldRF_Gap(self):
 		"""
 		It returns the  AxisFieldRF_Gap instance for this gap.
@@ -96,13 +112,32 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		"""		
 		return self.axis_field_rf_gap.baserf_gap
 		
+	def reverseOrderNodeSpecific(self):
+		"""
+		This method is used for a lattice reversal and a bunch backtracking
+		This is a node type specific method. The implementation of the abstract
+		method of AccNode class from the top level lattice package. 
+		"""
+		self.reversed_lattice = not self.reversed_lattice
+		#---- Here the order of quads does not matter
+		for quad_ind in range(len(self.quads_fields_arr)):
+			[quad, fieldFunc, z_center_of_field] = self.quads_fields_arr[quad_ind]
+			self.quads_fields_arr[quad_ind][2] = - z_center_of_field
+		(self.z_min,self.z_max) = (-self.z_max,-self.z_min)  
+			
+	def isNodeInReversedLattice(self):
+		"""
+		Returns True if this node in the reversed lattice or False if it otherwise.
+		"""
+		return self.reversed_lattice		
+		
 	def addQuad(self, quad, fieldFunc, z_center_of_field):
 		"""
 		Adds the quad with the field function and the position.
 		The position of the quad is relative to the center of 
 		the parent rf gap node.
 		"""
-		self.quads_fields_arr.append((quad, fieldFunc, z_center_of_field))		
+		self.quads_fields_arr.append([quad, fieldFunc, z_center_of_field])		
 		
 	def getQuads(self):
 		"""
@@ -116,8 +151,11 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 	def getPosAndQuad_Arr(self):
 		"""
 		Return the array with pairs: the quad and the position of its center.
-		"""		
-		return self.quad_arr
+		"""
+		quad_arr = []
+		for [quad, fieldFunc, z_center_of_field] in self.quads_fields_arr:
+			quad_arr.append([quad,z_center_of_field])
+		return quad_arr
 
 	def getTotalField(self,z_from_center):
 		"""
@@ -134,6 +172,22 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 			else:
 				G += quad.getTotalField(z - z_center_of_field)
 		return G		
+
+	def getTotalFieldDerivative(self,z_from_center):
+		"""
+		Returns the combined derivative of the field of all overlapping quads.
+		z_from_center - is a distance from the center of the parent RF gap node.
+		"""
+		z = z_from_center
+		GP = 0.
+		if(z < self.z_min or z > self.z_max): return GP
+		for [quad, fieldFunc, z_center_of_field] in self.quads_fields_arr:
+			if(fieldFunc != None):
+				gl = quad.getParam("dB/dr")*quad.getLength()
+				GP += gl*fieldFunc.getFuncDerivative(z - z_center_of_field)
+			else:
+				GP += 0.
+		return GP
 
 	def getZ_Step(self):
 		"""
@@ -180,6 +234,14 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		rfCavity = self.getRF_Cavity()
 		E0L = 1.0e+9*self.getParam("E0L")
 		rf_ampl = rfCavity.getAmp()
+		Ez = self.getEzFiledInternal(z,rfCavity,E0L,rf_ampl)
+		return Ez
+
+	def getEzFiledInternal(self,z,rfCavity,E0L,rf_ampl):
+		"""
+		Returns the Ez field on the axis of the RF gap in V/m. 
+		"""
+		if(self.reversed_lattice): z *= -1
 		Ez = E0L*rf_ampl*self.axis_field_rf_gap.axis_field_func.getY(z)	
 		return Ez
 
@@ -225,7 +287,7 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		eKin_in = syncPart.kinEnergy()
 		momentum = syncPart.momentum()
 		E0L = 1.0e+9*self.getParam("E0L")
-		modePhase = self.getParam("mode")*math.pi
+		modePhase = self.axis_field_rf_gap.baserf_gap.getParam("mode")*math.pi
 		frequency = rfCavity.getFrequency()	
 		rf_ampl = rfCavity.getAmp()
 		arrival_time = syncPart.time()
@@ -240,11 +302,13 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		zm = self.part_pos
 		z0 = zm + part_length/2
 		zp = z0 + part_length/2
-		Em = E0L*rf_ampl*self.axis_field_rf_gap.axis_field_func.getY(zm)
-		E0 = E0L*rf_ampl*self.axis_field_rf_gap.axis_field_func.getY(z0)
-		Ep = E0L*rf_ampl*self.axis_field_rf_gap.axis_field_func.getY(zp)			
+		Em = self.getEzFiledInternal(zm,rfCavity,E0L,rf_ampl)
+		E0 = self.getEzFiledInternal(z0,rfCavity,E0L,rf_ampl)
+		Ep = self.getEzFiledInternal(zp,rfCavity,E0L,rf_ampl)			
 		#------- track through a quad
 		G = self.getTotalField((zm+z0)/2)
+		GP = 0.
+		if(self.useLongField == True): GP = self.getTotalFieldDerivative((zm+z0)/2)
 		if(abs(G) != 0.):
 			kq = G/(3.335640952*momentum)
 			#------- track through a quad
@@ -254,9 +318,12 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 			self.tracking_module.quad1(bunch,step/2.0, kq)
 			self.tracking_module.quad2(bunch,step/2.0)
 			self.tracking_module.quad1(bunch,step/4.0, kq)
+			if(abs(GP) != 0.):
+				kqP = GP/(3.335640952*momentum)
+				self.tracking_module.quad3(bunch,step, kqP)
 		else:
 			self.tracking_module.drift(bunch,part_length/2)
-		self.part_pos += part_length/2	
+		self.part_pos += part_length/2
 		#call rf gap model to track the bunch
 		time_middle_gap = syncPart.time() - arrival_time
 		delta_phase = math.fmod(2*math.pi*time_middle_gap*frequency,2.0*math.pi)
@@ -272,6 +339,8 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		self.cppGapModel.trackBunch(bunch,part_length/2,Em,E0,Ep,frequency,phase+delta_phase+modePhase)
 		#------- track through a quad		
 		G = self.getTotalField((z0+zp)/2)
+		GP = 0.
+		if(self.useLongField == True): GP = self.getTotalFieldDerivative((z0+zp)/2)		
 		if(abs(G) != 0.):
 			kq = G/(3.335640952*momentum)
 			step = part_length/2
@@ -280,6 +349,9 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 			self.tracking_module.quad1(bunch,step/2.0, kq)
 			self.tracking_module.quad2(bunch,step/2.0)
 			self.tracking_module.quad1(bunch,step/4.0, kq)
+			if(abs(GP) != 0.):
+				kqP = GP/(3.335640952*momentum)
+				self.tracking_module.quad3(bunch,step, kqP)
 		else:
 			self.tracking_module.drift(bunch,part_length/2)
 		#---- advance the particle position
@@ -336,7 +408,7 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		eKin_in = syncPart.kinEnergy()
 		#---- parameter E0L is in GeV, but cppGapModel = RfGapThreePointTTF() uses fields in V/m
 		E0L = 1.0e+9*self.getParam("E0L")
-		modePhase = self.getParam("mode")*math.pi
+		modePhase = self.axis_field_rf_gap.baserf_gap.getParam("mode")*math.pi
 		rfCavity = self.getRF_Cavity()
 		rf_ampl = rfCavity.getDesignAmp()
 		arrival_time = syncPart.time()
@@ -348,7 +420,7 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 			phase = self.axis_field_rf_gap.calculate_first_part_phase(bunch)
 			rfCavity.setFirstGapEtnrancePhase(phase)
 			rfCavity.setFirstGapEtnranceDesignPhase(phase)
-			rfCavity.setDesignSetUp(True)		
+			rfCavity.setDesignSetUp(True)
 			rfCavity._setDesignPhase(rfCavity.getPhase())
 			rfCavity._setDesignAmp(rfCavity.getAmp())
 			#print "debug firs gap first part phase=",phase*180./math.pi," arr time=",arrival_time
@@ -363,9 +435,9 @@ class AxisField_and_Quad_RF_Gap(AbstractRF_Gap):
 		zm = self.part_pos
 		z0 = zm + part_length/2
 		zp = z0 + part_length/2
-		Em = E0L*rf_ampl*self.axis_field_rf_gap.axis_field_func.getY(zm)
-		E0 = E0L*rf_ampl*self.axis_field_rf_gap.axis_field_func.getY(z0)
-		Ep = E0L*rf_ampl*self.axis_field_rf_gap.axis_field_func.getY(zp)			
+		Em = self.getEzFiledInternal(zm,rfCavity,E0L,rf_ampl)
+		E0 = self.getEzFiledInternal(z0,rfCavity,E0L,rf_ampl)
+		Ep = self.getEzFiledInternal(zp,rfCavity,E0L,rf_ampl)
 		#---- advance the particle position
 		self.tracking_module.drift(bunch,part_length/2)
 		self.part_pos += part_length/2	
@@ -431,7 +503,7 @@ class OverlappingQuadsNode(BaseLinacNode):
 		"""
 		Constructor. Creates the OverlappingQuadsNode instance.
 		"""
-		BaseLinacNode.__init__(self,name)
+		BaseLinacNode.__init__(self,name = "OVRLPQ")
 		self.setType("OVRLPQ")
 		self.setnParts(1)
 		#----quads_fields_arr is an array of [quad, fieldFunc, z_center_of_field]
@@ -442,13 +514,47 @@ class OverlappingQuadsNode(BaseLinacNode):
 		self.z_step = 0.01 
 		#---- the initial length is 0.
 		self.setLength(0.)
+		#---- If we going to use the longitudinal magnetic field component of quad
+		self.useLongField = False
+		#---- If it is true then the this tracking will be in the reversed lattice
+		self.reversed_lattice = False
+		
+	def setUseLongitudinalFieldOfQuad(self, use):
+		"""
+		If we going to use the longitudinal magnetic field component of quad
+		"""
+		self.useLongField = use
+		
+	def getUseLongitudinalFieldOfQuad(self):
+		"""
+		If we going to use the longitudinal magnetic field component of quad
+		"""
+		return self.useLongField		
+		
+	def reverseOrderNodeSpecific(self):
+		"""
+		This method is used for a lattice reversal and a bunch backtracking
+		This is a node type specific method. The implementation of the abstract
+		method of AccNode class from the top level lattice package.  
+		"""
+		self.reversed_lattice = not self.reversed_lattice
+		#---- Here the order of quads does not matter
+		for quad_ind in range(len(self.quads_fields_arr)):
+			[quad, fieldFunc, z_center_of_field] = self.quads_fields_arr[quad_ind]
+			self.quads_fields_arr[quad_ind][2] = - z_center_of_field + self.getLength()
+			
+	def isNodeInReversedLattice(self):
+		"""
+		Returns True if this node in the reversed lattice or False if it otherwise.
+		"""
+		return self.reversed_lattice
 		
 	def addQuad(self, quad, fieldFunc, z_center_of_field):
 		"""
 		Adds the quad with the field function and the position.
 		The position of the quad is relative to the beginning of this OverlappingQuadsNode.
 		"""
-		self.quads_fields_arr.append((quad, fieldFunc, z_center_of_field))
+		self.quads_fields_arr.append([quad, fieldFunc, z_center_of_field])
 				
 	def setZ_Step(self,z_step):
 		"""
@@ -514,6 +620,8 @@ class OverlappingQuadsNode(BaseLinacNode):
 		for z_ind in range(n_steps):
 			z = self.z_value + z_step*(z_ind+0.5)
 			G = self.getTotalField(z)
+			GP = 0.
+			if(self.useLongField == True): GP = self.getTotalFieldDerivative(z)			
 			kq = G/(3.335640952*momentum)
 			if(abs(kq) == 0.):
 				self.tracking_module.drift(bunch,z_step)
@@ -524,6 +632,9 @@ class OverlappingQuadsNode(BaseLinacNode):
 			self.tracking_module.quad1(bunch,z_step/2.0, kq)
 			self.tracking_module.quad2(bunch,z_step/2.0)
 			self.tracking_module.quad1(bunch,z_step/4.0, kq)
+			if(abs(GP) != 0.):
+				kqP = GP/(3.335640952*momentum)
+				self.tracking_module.quad3(bunch,z_step, kqP)			
 		self.z_value += length
 		
 	def getTotalField(self,z_from_center):
@@ -542,4 +653,21 @@ class OverlappingQuadsNode(BaseLinacNode):
 			else:
 				G += quad.getTotalField(z - z_center_of_field)
 		return G
+		
+	def getTotalFieldDerivative(self,z_from_center):
+		"""
+		Returns the combined derivative of the field of all overlapping quads.
+		z_from_center - is a distance from the center of the node.
+		z - is a distance from the beginning of the node.
+		"""
+		z = z_from_center + self.getLength()/2
+		GP = 0.
+		if(z < 0. or z > self.getLength()): return GP
+		for [quad, fieldFunc, z_center_of_field] in self.quads_fields_arr:
+			if(fieldFunc != None):
+				gl = quad.getParam("dB/dr")*quad.getLength()
+				GP += gl*fieldFunc.getFuncDerivative(z - z_center_of_field)
+			else:
+				GP += 0.
+		return GP	
 

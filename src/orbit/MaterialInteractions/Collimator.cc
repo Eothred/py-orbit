@@ -24,8 +24,8 @@
 //
 // PARAMETERS
 //   length: length in m
-//   ma:	 material number. (1=carbon, 2=aluminum, 3=iron, 4=copper, 5=tantalum, 6=tungstun,
-//			 7=platinum, 8=lead, 9 = black absorber)
+//   ma:	 material number. (0=carbon, 1=aluminum, 2=iron, 3=copper, 4=tantalum, 5=tungstun,
+//           6=platinum, 7=lead, ma>=8 = black absorber)
 //   densityfac: density factor (for materials mixed with air or water). 1.0 for pure. 
 //   shape:  shape of the collimator: 1=circle, 2=ellipse, 3=one sided
 //           flat, 4=two sided flat, 5=rectangular (outside is collimator),
@@ -99,7 +99,7 @@ void Collimator::collimateBunch(Bunch* bunch, Bunch* lostbunch){
 		coll_flag = checkCollFlag(part_coord_arr[ip][0], part_coord_arr[ip][2]);
 		
 		if(coll_flag == 1){
-			if(ma_ == 9) loseParticle(bunch, lostbunch, ip, nLost, coll_flag, zrl);
+			if(ma_ >= 8) loseParticle(bunch, lostbunch, ip, nLost, coll_flag, zrl);
 		}
 		
 		while(zrl > 0){
@@ -110,7 +110,7 @@ void Collimator::collimateBunch(Bunch* bunch, Bunch* lostbunch){
 			//If in the collimator, tally the hit and start tracking
 			if(coll_flag == 1) {
 				//Lose it for black absorber
-				if(ma_ == 9){
+				if(ma_ >= 8){
 					loseParticle(bunch, lostbunch, ip, nLost, coll_flag, zrl);
 					break;
 				}
@@ -347,24 +347,22 @@ int Collimator::checkCollFlag(double x, double y){
 	
 
 int Collimator::driftParticle(int coll_flag, double& zrl, double length, double* coords, SyncPart* syncpart){
+	double eps = 1.0e-8;
+	double dlength = length * 1.0e-4;
+	double stepsize = 0.001;
+
 	while((coll_flag == 0) && (zrl > 0))
 	{
 		
-		double x = coords[0];
-		double xp = coords[1];
-		double y = coords[2];
-		double yp = coords[3];
-		double dlength = length * 1.0e-4;
-		double stepsize = 0.001;
 		if(stepsize > length / 10.) stepsize = length / 10.;
-		if(stepsize > zrl) stepsize = zrl + dlength;
+		if(stepsize - zrl > eps) stepsize = zrl + dlength;
 				
 		double pfac = Collimator::getPFactor(coords, syncpart);
 	
-		x += stepsize * xp / pfac;
-		y += stepsize * yp / pfac;
+		coords[0] += stepsize * coords[1] / pfac;
+		coords[2] += stepsize * coords[3] / pfac;
 		zrl -= stepsize;
-		coll_flag = Collimator::checkCollFlag(x, y);
+		coll_flag = Collimator::checkCollFlag(coords[0], coords[2]);
 		
 		nHits++;
 		if(coll_flag == 1) return 1;
@@ -778,4 +776,3 @@ void Collimator::setPosition(double position){
 }
 	
 	
-
