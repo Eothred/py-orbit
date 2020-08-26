@@ -6,7 +6,7 @@ from orbit_mpi import mpi_comm
 from orbit_mpi import mpi_datatype
 from orbit_mpi import mpi_op
 
-from spacecharge import Grid2D
+from orbit.mod.spacecharge import Grid2D
 
 from orbit_utils import Function
 from orbit_utils import SplineCH

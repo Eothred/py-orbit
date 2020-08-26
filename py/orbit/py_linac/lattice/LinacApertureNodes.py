@@ -11,9 +11,9 @@ import os
 from orbit.py_linac.lattice import BaseLinacNode, Quad
 
 # import aperture C++ classes
-from aperture import Aperture
-from aperture import PhaseAperture
-from aperture import EnergyAperture
+from orbit.mod.aperture import Aperture
+from orbit.mod.aperture import PhaseAperture
+from orbit.mod.aperture import EnergyAperture
 
 
 class LinacApertureNode(BaseLinacNode):

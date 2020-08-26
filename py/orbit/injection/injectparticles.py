@@ -6,12 +6,12 @@ This is not a parallel version!
 import math
 import random
 import sys
-from bunch import Bunch
+from orbit.mod.bunch import Bunch
 #from mpi import orbit_mpi
-import orbit_mpi
-from orbit_mpi import mpi_comm
-from orbit_mpi import mpi_datatype
-from orbit_mpi import mpi_op
+from orbit.mod import orbit_mpi
+from orbit.mod.orbit_mpi import mpi_comm
+from orbit.mod.orbit_mpi import mpi_datatype
+from orbit.mod.orbit_mpi import mpi_op
 
 class InjectParts:
 	""" 

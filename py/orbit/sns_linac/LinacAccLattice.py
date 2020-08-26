@@ -20,7 +20,7 @@ from orbit.lattice import AccLattice, AccNode, AccActionsContainer
 from LinacAccNodes import RF_Cavity, Sequence, Quad, BaseRF_Gap, MarkerLinacNode
 
 # import orbit Bunch
-from bunch import Bunch
+from orbit.bunch import Bunch
 
 class LinacAccLattice(AccLattice):
 	"""

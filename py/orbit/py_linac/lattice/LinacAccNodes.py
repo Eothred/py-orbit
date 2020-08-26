@@ -23,7 +23,7 @@ from orbit.teapot_base import TPB
 # drift - linac drift tracking
 # quad1 - linac quad linear part of tracking
 # quad2 - linac quad non-linear part of tracking
-import linac_tracking
+from orbit.mod import linac_tracking
 
 class BaseLinacNode(AccNodeBunchTracker):
 	""" 

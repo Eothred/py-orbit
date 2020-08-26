@@ -15,7 +15,7 @@ from orbit.lattice import AccNode, AccActionsContainer, AccNodeBunchTracker
 from orbit.teapot import DriftTEAPOT
 
 # import Collimator class
-from collimator import Collimator
+from orbit.mod.collimator import Collimator
 
 class TeapotCollimatorNode(DriftTEAPOT):
 	""" 

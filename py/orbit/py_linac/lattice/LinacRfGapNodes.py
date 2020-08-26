@@ -8,10 +8,10 @@ import math
 import sys
 
 #---- MPI module function and classes
-import orbit_mpi
-from orbit_mpi import mpi_comm
-from orbit_mpi import mpi_datatype
-from orbit_mpi import mpi_op
+from orbit.mod import orbit_mpi
+from orbit.mod.orbit_mpi import mpi_comm
+from orbit.mod.orbit_mpi import mpi_datatype
+from orbit.mod.orbit_mpi import mpi_op
 
 # import from orbit Python utilities
 from orbit.utils import orbitFinalize
@@ -19,16 +19,16 @@ from orbit.utils import phaseNearTargetPhase, phaseNearTargetPhaseDeg
 from orbit.utils import speed_of_light
 
 # import from orbit c++ utilities
-from orbit_utils import Polynomial
-from orbit_utils import Function
+from orbit.mod.orbit_utils import Polynomial
+from orbit.mod.orbit_utils import Function
 
 # from LinacAccLattice import Sequence
 from LinacAccLatticeLib import Sequence
 from LinacAccNodes import Drift, BaseLinacNode
 
 # from linac import the RF gap classes
-from linac import BaseRfGap, MatrixRfGap, RfGapTTF, RfGapThreePointTTF
-from linac import BaseRfGap_slow, RfGapTTF_slow, RfGapThreePointTTF_slow
+from orbit.mod.linac import BaseRfGap, MatrixRfGap, RfGapTTF, RfGapThreePointTTF
+from orbit.mod.linac import BaseRfGap_slow, RfGapTTF_slow, RfGapThreePointTTF_slow
 
 # The abstract RF gap import
 from LinacAccNodes import AbstractRF_Gap
@@ -43,7 +43,7 @@ from orbit.teapot_base import TPB
 # quad2 - linac quad non-linear part of tracking
 import linac_tracking
 
-from bunch import Bunch
+from orbit.mod.bunch import Bunch
 
 
 class BaseRF_Gap(AbstractRF_Gap):

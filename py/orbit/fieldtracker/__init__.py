@@ -4,7 +4,7 @@
 ## Classes:
 
 
-from fieldtracker import FieldTracker
+from orbit.mod.fieldtracker import FieldTracker
 
 __all__ = []
 __all__.append("FieldTracker")

@@ -15,10 +15,10 @@ from orbit.utils import orbitFinalize, NamedObject, ParamsDictObject
 from orbit.lattice import AccNode, AccActionsContainer, AccNodeBunchTracker
 
 # import teapot base functions from wrapper around C++ functions
-from orbit.teapot_base import TPB
+from orbit import teapot_base as TPB
 
 # from linac import the RF gap classes
-from linac import BaseRfGap, MatrixRfGap
+from orbit.linac import BaseRfGap, MatrixRfGap
 
 class BaseLinacNode(AccNodeBunchTracker):
 	""" 

@@ -21,12 +21,12 @@ from orbit.lattice import AccLattice, AccNode, AccActionsContainer
 
 from orbit.py_linac.lattice import MarkerLinacNode
 
-import orbit_utils
-from orbit_utils import bunch_utils_functions
+from orbit.mod import orbit_utils
+from orbit.mod.orbit_utils import bunch_utils_functions
 from bunch_utils_functions import copyCoordsToInitCoordsAttr
 from bunch_utils_functions import transportMtrxFromInitCoords
 
-from orbit_utils import Matrix
+from orbit.mod.orbit_utils import Matrix
 
 class LinacTrMatrixGenNode(MarkerLinacNode):
 	"""

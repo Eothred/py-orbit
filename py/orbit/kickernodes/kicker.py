@@ -6,7 +6,7 @@ This is not a parallel version!
 import math
 import random
 import sys
-from bunch import Bunch
+from orbit.mod.bunch import Bunch
 
 class XKicker:
 	""" 

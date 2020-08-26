@@ -2,7 +2,7 @@ import os
 import sys
 import re
 import math
-from spacecharge import Grid3D
+from orbit.mod.spacecharge import Grid3D
 
 class Field_Parser3D:
 	""" 3D field parser """
