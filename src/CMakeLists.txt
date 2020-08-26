@@ -1,8 +1,8 @@
 # Find all external projects we (optionally) need
 # For optional, add option to turn on/off, default to on if 
 # module is found
-find_package (Python2 COMPONENTS Interpreter Development)
-include_directories(${Python2_INCLUDE_DIR})
+find_package (Python2 REQUIRED COMPONENTS Interpreter Development)
+include_directories(${Python2_INCLUDE_DIRS})
 # FindPTC..
 
 find_package(FFTW)
@@ -35,6 +35,7 @@ include_directories(teapot)
 include_directories(trackerrk4)
 include_directories(utils)
 include_directories(utils/bunch)
+include_directories(utils/harmonic_analysis)
 include_directories(utils/integration)
 include_directories(utils/matrix)
 include_directories(utils/polynomial)

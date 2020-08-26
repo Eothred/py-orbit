@@ -134,6 +134,8 @@ set(pyorbit_src
  utils/bunch/wrap_bunch_utils_functions.cc
  utils/CppPyWrapper.cc
  utils/FieldSourceContainer.cc
+ utils/harmonic_analysis/HarmonicData.cc
+ utils/harmonic_analysis/wrap_harmonic_data.cc
  utils/integration/GaussLegendreIntegrator.cc
  utils/integration/gauss_legendre_points.cc
  utils/integration/wrap_gauss_legendre_integrator.cc
