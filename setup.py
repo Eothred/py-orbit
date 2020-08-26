@@ -46,7 +46,6 @@ setup(
                 'orbit.utils.xml',
                 'orbit.utils.orbit_mpi_utils',
                ],
-    scripts = ['bin/pyORBIT'],
     classifiers=[  # Optional
     # How mature is this project? Common values are
     #   3 - Alpha
