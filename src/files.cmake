@@ -46,8 +46,6 @@ set(pyorbit_src
  orbit/MaterialInteractions/Foil.cc
  orbit/MaterialInteractions/MaterialInteractions.cc
  orbit/MaterialInteractions/numrecipes.cc
- orbit/MaterialInteractions/wrap_collimator.cc
- orbit/MaterialInteractions/wrap_foil.cc
  orbit/OrbitConst.cc
  orbit/ParticlesAttributes/AtomPopulations.cc
  orbit/ParticlesAttributes/Evolution.cc

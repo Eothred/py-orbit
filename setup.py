@@ -22,6 +22,7 @@ setup(
                 'orbit.lattice',
                 'orbit.matching',
                 'orbit.matrix_lattice',
+                'orbit.mod',
                 'orbit.orbit_correction',
                 'orbit.parsers',
                 'orbit.py_linac',
